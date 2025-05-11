@@ -124,7 +124,7 @@ const StartMenu = () => {
                 return response.json()
             })
             .then((data) => {
-                quizDataMonacoRef.current!.setValue(JSON.stringify(data, null, 2))
+                quizDataMonacoRef.current!.setValue(JSON.stringify(data, null, 4))
             })
             .catch((_) => {
                 errorRef.current!.textContent = 'Failed to fetch quiz data'

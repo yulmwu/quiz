@@ -75,7 +75,7 @@ const Game = () => {
         }
 
         previousQuestion.push(question)
-        if (previousQuestion.length > 1) previousQuestion.shift()
+        if (previousQuestion.length >= quiz!.questions.length) previousQuestion.shift()
 
         questionRef.current!.textContent = question.question
         currentQuestion = question
@@ -106,11 +106,11 @@ const Game = () => {
             button.classList.add(
                 i === options.length - 1 && !is_even ? 'w-full' : 'w-[calc(50%-0.5rem)]', // 50% - 0.5rem(8px) (half of the gap)
                 'h-32',
-                'bg-gray-200',
+                'bg-gray-100',
                 'text-gray-800',
                 'rounded-lg',
                 'shadow-md',
-                'hover:bg-gray-300'
+                'hover:bg-gray-200'
             )
             button.onclick = () => checkAnswer(option, button)
             optionsDiv.appendChild(button)
