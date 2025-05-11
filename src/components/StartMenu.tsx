@@ -70,7 +70,12 @@ const StartMenu = () => {
     return (
         <div className='container'>
             <div className='card'>
-                <div className='mt-6 flex justify-between'>
+                <h1 className='text-2xl font-bold text-center mb-4'>{useSettings.getState().quiz.name}</h1>
+                <p className='text-sm text-gray-600 text-center mb-4'>{useSettings.getState().quiz.description}</p>
+                <div className='flex justify-center items-center space-x-2 mb-4 mt-4'>
+                    {/* <button className='bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600' onClick={startGame}>
+                        시작
+                    </button> */}
                     <button className='bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600' onClick={startGame}>
                         시작
                     </button>

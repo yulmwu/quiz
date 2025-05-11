@@ -10,9 +10,11 @@ const Game = () => {
 
     const scoreRef = useRef<HTMLHeadingElement>(null) // 점수
     const questionRef = useRef<HTMLHeadingElement>(null) // 문제
+    const hintRef = useRef<HTMLParagraphElement>(null) // 힌트
     const resultRef = useRef<HTMLParagraphElement>(null) // 정답 여부
     const optionsRef = useRef<HTMLDivElement>(null) // 문제 답변 선택지
     const nextButtonRef = useRef<HTMLButtonElement>(null) // 다음 문제 버튼
+    const hintButtonRef = useRef<HTMLButtonElement>(null) // 힌트 버튼
 
     let currentQuestion: Question | null = null // 현재 문제
     // 중복 문제 방지용
@@ -47,6 +49,7 @@ const Game = () => {
         nextButtonRef.current!.disabled = true
 
         resultRef.current!.textContent = ''
+        hintRef.current!.textContent = ''
 
         const question = randomQuestion()
         if (previousQuestion.includes(question)) {
@@ -59,6 +62,12 @@ const Game = () => {
 
         questionRef.current!.textContent = question.question
         currentQuestion = question
+
+        if (currentQuestion.hint) {
+            hintButtonRef.current!.disabled = false
+        } else {
+            hintButtonRef.current!.disabled = true
+        }
 
         genarateOptions()
     }
@@ -99,6 +108,7 @@ const Game = () => {
             createFirework(rect.x + rect.width / 2, rect.y + rect.height / 2)
 
             nextButtonRef.current!.disabled = false
+            hintButtonRef.current!.disabled = true
         } else {
             result.textContent = `오답입니다. 다시 한번 생각해보세요.`
             result.className = 'text-red-500 text-center pt-3'
@@ -107,6 +117,12 @@ const Game = () => {
             incorrectCount++
             scoreUpdate(Settings.score_const.incorrect)
         }
+    }
+
+    const hintButton = () => {
+        if (!currentQuestion) return
+        hintButtonRef.current!.disabled = true
+        hintRef.current!.textContent = `힌트: ${currentQuestion.hint}`
     }
 
     const nextButton = () => {
@@ -124,9 +140,10 @@ const Game = () => {
     return (
         <div className='container'>
             <div className='card'>
-                <p id='score' className='text-xl text-center pb-3' ref={scoreRef}>
+                <p id='score' className='text-lg text-center pb-3' ref={scoreRef}>
                     점수: 0 {showCorrectRate ? '(정답률: 0%)' : ''}
                 </p>
+                <p id='hint' className='text-lg text-center pb-3' ref={hintRef}></p>
                 <div>
                     <p id='question' className='text-3xl text-center' ref={questionRef}>
                         ?
@@ -136,8 +153,15 @@ const Game = () => {
             </div>
 
             <div className='card'>
-                <div id='options' className='flex justify-center flex-wrap gap-5' ref={optionsRef}></div>
-                <div id='next' className='flex justify-center flex-wrap gap-5 mt-5'>
+                <div id='options' className='flex flex-col gap-5' ref={optionsRef}></div>
+                <div className='flex justify-center flex-wrap gap-5 mt-5'>
+                    <button
+                        className='bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600'
+                        onClick={hintButton}
+                        ref={hintButtonRef}
+                    >
+                        힌트
+                    </button>
                     <button
                         className='bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600'
                         onClick={nextButton}
