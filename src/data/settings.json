@@ -1,0 +1,19 @@
+{
+    "score_const": {
+        "default": 0,
+        "correct": 5,
+        "incorrect": -3,
+        "timeout": -10,
+        "skip": -10,
+        "hint": -5
+    },
+    "keybinds": {
+        "skip": "backspace",
+        "hint": "h",
+        "option1": "1",
+        "option2": "2",
+        "option3": "3",
+        "option4": "4",
+        "option5": "5"
+    }
+}

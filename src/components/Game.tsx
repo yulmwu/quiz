@@ -1,0 +1,160 @@
+import { useRef, useEffect } from 'react'
+import { useSettings } from './StartMenu'
+
+import Settings from '../data/settings.json'
+import { Question } from '../quiz'
+import createFirework from '../utils/firework'
+
+const Game = () => {
+    let { quiz, playing, score, correctCount, incorrectCount, showCorrectRate } = useSettings((state) => state)
+
+    const scoreRef = useRef<HTMLHeadingElement>(null) // 점수
+    const questionRef = useRef<HTMLHeadingElement>(null) // 문제
+    const resultRef = useRef<HTMLParagraphElement>(null) // 정답 여부
+    const optionsRef = useRef<HTMLDivElement>(null) // 문제 답변 선택지
+    const nextButtonRef = useRef<HTMLButtonElement>(null) // 다음 문제 버튼
+
+    let currentQuestion: Question | null = null // 현재 문제
+    // 중복 문제 방지용
+    let previousQuestion: Array<Question> = []
+
+    const randomQuestion = () => quiz.questions[Math.floor(Math.random() * quiz.questions.length)]
+
+    const disableAllButtons = (state: boolean) => {
+        const optionsDiv = optionsRef.current as HTMLDivElement
+        const buttons = optionsDiv.querySelectorAll('button')
+        buttons.forEach((button) => {
+            button.disabled = state
+        })
+    }
+
+    const calcCorrectRate = (): number => {
+        if (correctCount + incorrectCount === 0) return 0
+        return (correctCount / (correctCount + incorrectCount)) * 100
+    }
+
+    const scoreUpdate = (n?: number) => {
+        if (!n) score = Settings.score_const.default
+        else score += n
+
+        scoreRef.current!.textContent = `점수: ${score} ${showCorrectRate ? `(정답률: ${calcCorrectRate().toFixed(2)}%)` : ''}`
+    }
+
+    const nextQuestion = () => {
+        if (!playing) return
+
+        disableAllButtons(false)
+        nextButtonRef.current!.disabled = true
+
+        resultRef.current!.textContent = ''
+
+        const question = randomQuestion()
+        if (previousQuestion.includes(question)) {
+            nextQuestion()
+            return
+        }
+
+        previousQuestion.push(question)
+        if (previousQuestion.length > 1) previousQuestion.shift()
+
+        questionRef.current!.textContent = question.question
+        currentQuestion = question
+
+        genarateOptions()
+    }
+
+    const genarateOptions = () => {
+        if (!currentQuestion) return
+
+        const options = currentQuestion.options.sort(() => Math.random() - 0.5)
+
+        const optionsDiv = optionsRef.current as HTMLDivElement
+        optionsDiv.innerHTML = ''
+        options.forEach((option) => {
+            const button = document.createElement('button')
+            button.textContent = option
+            button.className = 'bg-gray-200 text-gray-800 px-4 py-2 rounded-lg shadow-md hover:bg-gray-300'
+            button.onclick = () => checkAnswer(option, button)
+            optionsDiv.appendChild(button)
+        })
+    }
+
+    const checkAnswer = (selected: string, button: HTMLButtonElement) => {
+        if (!currentQuestion) return
+        button.disabled = true
+
+        const result = resultRef.current as HTMLParagraphElement
+
+        if (selected === currentQuestion.correct) {
+            disableAllButtons(true)
+
+            result.textContent = '정답입니다!'
+            result.className = 'text-green-500 text-center pt-3'
+            button.classList.add('correct')
+
+            correctCount++
+            scoreUpdate(Settings.score_const.correct)
+
+            const rect = button.getBoundingClientRect()
+            createFirework(rect.x + rect.width / 2, rect.y + rect.height / 2)
+
+            nextButtonRef.current!.disabled = false
+        } else {
+            result.textContent = `오답입니다. 다시 한번 생각해보세요.`
+            result.className = 'text-red-500 text-center pt-3'
+            button.classList.add('incorrect', 'incorrect-animation')
+
+            incorrectCount++
+            scoreUpdate(Settings.score_const.incorrect)
+        }
+    }
+
+    const nextButton = () => {
+        nextQuestion()
+        nextButtonRef.current!.disabled = true
+    }
+
+    useEffect(() => {
+        if (playing) {
+            scoreUpdate()
+            nextQuestion()
+        }
+    })
+
+    return (
+        <div className='container'>
+            <div className='card'>
+                <p id='score' className='text-xl text-center pb-3' ref={scoreRef}>
+                    점수: 0 {showCorrectRate ? '(정답률: 0%)' : ''}
+                </p>
+                <div>
+                    <p id='question' className='text-3xl text-center' ref={questionRef}>
+                        ?
+                    </p>
+                </div>
+                <p id='result' className='text-center pt-3' ref={resultRef}></p>
+            </div>
+
+            <div className='card'>
+                <div id='options' className='flex justify-center flex-wrap gap-5' ref={optionsRef}></div>
+                <div id='next' className='flex justify-center flex-wrap gap-5 mt-5'>
+                    <button
+                        className='bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600'
+                        onClick={nextButton}
+                        ref={nextButtonRef}
+                    >
+                        다음 문제
+                    </button>
+                </div>
+            </div>
+
+            <div className='flex justify-center mt-20'>
+                <button className='bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600' onClick={() => window.location.reload()}>
+                    처음으로 돌아가기
+                </button>
+            </div>
+        </div>
+    )
+}
+
+export default Game

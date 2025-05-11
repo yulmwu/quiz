@@ -1,0 +1,104 @@
+import React, { useRef } from 'react'
+import { create } from 'zustand'
+import { quiz as exampleQuiz, Quiz } from '../quiz'
+
+/**
+ * playing: 게임 진행 여부
+ * score: 점수
+ * timer: 한 문제 당 시간 제한 (초)
+ * timeRemaining: 전체 시간 제한 (초)
+ * nextNow: 정답 후 바로 넘어가기 여부
+ * particle: 파티클 효과 여부
+ * correctCount: 정답 개수
+ * incorrectCount: 오답 개수
+ * showCorrectRate: 정답률 표시 여부
+ */
+interface Settings {
+    quiz: Quiz,
+    playing: boolean
+    score: number
+    // duplevel: number
+    correctCount: number
+    incorrectCount: number
+    showCorrectRate: boolean
+}
+
+const defaultSettings: Settings = {
+    quiz: exampleQuiz,
+    playing: false,
+    score: 0,
+    correctCount: 0,
+    incorrectCount: 0,
+    showCorrectRate: false,
+}
+
+const useSettings = create<Settings>((set) => defaultSettings)
+
+const StartMenu = () => {
+    const showCorrectRateRef = useRef<HTMLInputElement>(null)
+    const errorRef = useRef<HTMLDivElement>(null)
+
+    const checkboxLabelChange = (e: React.ChangeEvent<HTMLInputElement>, text: string) => {
+        if (e.currentTarget.nextElementSibling) e.currentTarget.nextElementSibling.textContent = text
+    }
+
+    const showCorrectRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.currentTarget.checked) {
+            checkboxLabelChange(e, '정답률 표시 함')
+        } else {
+            checkboxLabelChange(e, '정답률 표시 안함')
+        }
+    }
+
+    // const error = (message: string) => {
+    //     const error = errorRef.current as HTMLDivElement
+    //     error.textContent = message
+    //     error.classList.remove('hidden')
+    // }
+
+    const updateSettings = (start: boolean) => {
+        const showCorrectRate = (showCorrectRateRef.current as HTMLInputElement).checked
+
+        useSettings.setState({
+            playing: start,
+            showCorrectRate,
+        })
+    }
+
+    const startGame = () => updateSettings(true)
+
+    return (
+        <div className='container'>
+            <div className='card'>
+                <div className='mt-6 flex justify-between'>
+                    <button className='bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600' onClick={startGame}>
+                        시작
+                    </button>
+                </div>
+
+                <div
+                    className='text-center text-red-600 hidden cursor-pointer'
+                    ref={errorRef}
+                    onClick={() => errorRef.current?.classList.add('hidden')}
+                ></div>
+            </div>
+
+            {/* 옵션 카드 */}
+            <div className='card'>
+                <h2 className='text-xl font-semibold text-center mb-4'>옵션 (선택)</h2>
+                <p className='text-sm text-gray-600 text-center mb-4'>필요 시에만 선택하세요.</p>
+                <div className='space-y-2'>
+                    <div className='flex items-center space-x-2'>
+                        <input type='checkbox' ref={showCorrectRateRef} className='w-4 h-4' onChange={showCorrectRateChange} defaultChecked />
+                        <label htmlFor='strokeImage' className='text-gray-700'>
+                            정답률 표시 함
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+export default StartMenu
+export { useSettings, defaultSettings }

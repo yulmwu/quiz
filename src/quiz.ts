@@ -1,0 +1,47 @@
+interface Quiz {
+    name: string
+    description: string
+    questions: Array<Question>
+}
+
+interface Question {
+    question: string
+    options: Array<string>
+    correct: string
+    explanation: string
+    hint?: string
+}
+
+const quiz: Quiz = {
+    "name": "한국사 고려 퀴즈",
+    "description": "고려시대에 대한 퀴즈입니다.",
+    "questions": [
+        {
+            "question": "고려의 건국 연도는?",
+            "options": [
+                "918년",
+                "936년",
+                "1010년",
+                "1234년"
+            ],
+            "correct": "918년",
+            "explanation": "고려는 918년에 왕건에 의해 건국되었습니다.",
+            "hint": "포르쉐 OOO 스파이더"
+        },
+        {
+            "question": "고려의 수도는?",
+            "options": [
+                "개경",
+                "한양",
+                "평양",
+                "부여"
+            ],
+            "correct": "개경",
+            "explanation": "고려의 수도는 개경(현재의 개성)입니다.",
+            "hint": "멍멍"
+        }
+    ]
+};
+
+export type { Quiz, Question };
+export { quiz };
