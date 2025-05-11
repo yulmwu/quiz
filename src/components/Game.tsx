@@ -16,11 +16,18 @@ const Game = () => {
     const nextButtonRef = useRef<HTMLButtonElement>(null) // 다음 문제 버튼
     const hintButtonRef = useRef<HTMLButtonElement>(null) // 힌트 버튼
 
+    useEffect(() => {
+        if (playing) {
+            scoreUpdate()
+            nextQuestion()
+        }
+    })
+
     let currentQuestion: Question | null = null // 현재 문제
     // 중복 문제 방지용
     let previousQuestion: Array<Question> = []
 
-    const randomQuestion = () => quiz.questions[Math.floor(Math.random() * quiz.questions.length)]
+    const randomQuestion = () => quiz!.questions[Math.floor(Math.random() * quiz!.questions.length)]
 
     const disableAllButtons = (state: boolean) => {
         const optionsDiv = optionsRef.current as HTMLDivElement
@@ -129,13 +136,6 @@ const Game = () => {
         nextQuestion()
         nextButtonRef.current!.disabled = true
     }
-
-    useEffect(() => {
-        if (playing) {
-            scoreUpdate()
-            nextQuestion()
-        }
-    })
 
     return (
         <div className='container'>

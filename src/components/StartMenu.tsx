@@ -14,7 +14,7 @@ import { quiz as exampleQuiz, Quiz } from '../quiz'
  * showCorrectRate: 정답률 표시 여부
  */
 interface Settings {
-    quiz: Quiz,
+    quiz: Quiz | null
     playing: boolean
     score: number
     // duplevel: number
@@ -24,7 +24,7 @@ interface Settings {
 }
 
 const defaultSettings: Settings = {
-    quiz: exampleQuiz,
+    quiz: null,
     playing: false,
     score: 0,
     correctCount: 0,
@@ -35,6 +35,9 @@ const defaultSettings: Settings = {
 const useSettings = create<Settings>((set) => defaultSettings)
 
 const StartMenu = () => {
+    const quizNameRef = useRef<HTMLHeadingElement>(null)
+    const quizDescriptionRef = useRef<HTMLParagraphElement>(null)
+
     const showCorrectRateRef = useRef<HTMLInputElement>(null)
     const errorRef = useRef<HTMLDivElement>(null)
 
@@ -65,17 +68,36 @@ const StartMenu = () => {
         })
     }
 
-    const startGame = () => updateSettings(true)
+    const startGame = () => {
+        if (!useSettings.getState().quiz) {
+            errorRef.current!.textContent = '퀴즈 데이터를 불러오지 않았습니다.'
+            errorRef.current!.classList.remove('hidden')
+            return
+        }
+
+        updateSettings(true)
+    }
+
+    const fetchQuizData = () => {
+        const quizData = (document.querySelector('textarea') as HTMLTextAreaElement).value
+        try {
+            const quiz = JSON.parse(quizData)
+            useSettings.setState({ quiz })
+            errorRef.current!.classList.add('hidden')
+            quizNameRef.current!.textContent = quiz.name
+            quizDescriptionRef.current!.textContent = quiz.description
+        } catch (error) {
+            errorRef.current!.textContent = 'Invalid JSON'
+            errorRef.current!.classList.remove('hidden')
+        }
+    }
 
     return (
         <div className='container'>
             <div className='card'>
-                <h1 className='text-2xl font-bold text-center mb-4'>{useSettings.getState().quiz.name}</h1>
-                <p className='text-sm text-gray-600 text-center mb-4'>{useSettings.getState().quiz.description}</p>
+                <p className='text-2xl font-bold text-center mb-4' ref={quizNameRef}></p>
+                <p className='text-sm text-gray-600 text-center mb-4' ref={quizDescriptionRef}></p>
                 <div className='flex justify-center items-center space-x-2 mb-4 mt-4'>
-                    {/* <button className='bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600' onClick={startGame}>
-                        시작
-                    </button> */}
                     <button className='bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600' onClick={startGame}>
                         시작
                     </button>
@@ -100,6 +122,15 @@ const StartMenu = () => {
                         </label>
                     </div>
                 </div>
+            </div>
+
+            <div className='card'>
+                <h2 className='text-xl font-semibold text-center mb-4'>퀴즈 데이터 불러오기</h2>
+                <p className='text-sm text-gray-600 text-center mb-4'>JSON 데이터를 직접 입력하세요.</p>
+                <textarea className='w-full h-32 p-2 border border-gray-300 rounded-lg' placeholder='JSON 데이터'></textarea>
+                <button className='bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600' onClick={fetchQuizData}>
+                    검증 및 불러오기
+                </button>
             </div>
         </div>
     )
