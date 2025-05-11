@@ -1,6 +1,7 @@
 import React, { useRef } from 'react'
 import { create } from 'zustand'
-import { quiz as exampleQuiz, Quiz } from '../quiz'
+import { Quiz } from '../quiz'
+import { Editor } from '@monaco-editor/react'
 
 /**
  * playing: 게임 진행 여부
@@ -37,9 +38,13 @@ const useSettings = create<Settings>((set) => defaultSettings)
 const StartMenu = () => {
     const quizNameRef = useRef<HTMLHeadingElement>(null)
     const quizDescriptionRef = useRef<HTMLParagraphElement>(null)
+    const quizAutherDateRef = useRef<HTMLParagraphElement>(null)
 
     const showCorrectRateRef = useRef<HTMLInputElement>(null)
     const errorRef = useRef<HTMLDivElement>(null)
+
+    const quizDataMonacoRef = useRef<any>(null)
+    const quizFetchButtonRef = useRef<HTMLButtonElement>(null)
 
     const checkboxLabelChange = (e: React.ChangeEvent<HTMLInputElement>, text: string) => {
         if (e.currentTarget.nextElementSibling) e.currentTarget.nextElementSibling.textContent = text
@@ -79,26 +84,66 @@ const StartMenu = () => {
     }
 
     const fetchQuizData = () => {
-        const quizData = (document.querySelector('textarea') as HTMLTextAreaElement).value
+        const quizData = quizDataMonacoRef.current!.getValue()
+
         try {
             const quiz = JSON.parse(quizData)
             useSettings.setState({ quiz })
             errorRef.current!.classList.add('hidden')
+
             quizNameRef.current!.textContent = quiz.name
             quizDescriptionRef.current!.textContent = quiz.description
+            quizAutherDateRef.current!.textContent = `${quiz.authors.join(', ')} / 최종 업데이트: ${quiz.lastUpdated}`
+
+            quizFetchButtonRef.current!.disabled = true
         } catch (error) {
             errorRef.current!.textContent = 'Invalid JSON'
             errorRef.current!.classList.remove('hidden')
         }
     }
 
+    const changeQuizData = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const quizData = e.currentTarget.value
+        let url = ''
+
+        switch (quizData) {
+            case 'input':
+                return
+            case 'korea':
+                url = 'https://raw.githubusercontent.com/yulmwu/quiz_data/refs/heads/main/korea.json'
+                break
+            default:
+                errorRef.current!.textContent = 'Invalid quiz data'
+                errorRef.current!.classList.remove('hidden')
+                return
+        }
+
+        fetch(url)
+            .then((response) => {
+                if (!response.ok) throw new Error('Error fetching quiz data')
+                return response.json()
+            })
+            .then((data) => {
+                quizDataMonacoRef.current!.setValue(JSON.stringify(data, null, 2))
+            })
+            .catch((_) => {
+                errorRef.current!.textContent = 'Failed to fetch quiz data'
+                errorRef.current!.classList.remove('hidden')
+            })
+    }
+
     return (
         <div className='container'>
             <div className='card'>
-                <p className='text-2xl font-bold text-center mb-4' ref={quizNameRef}></p>
-                <p className='text-sm text-gray-600 text-center mb-4' ref={quizDescriptionRef}></p>
+                <p className='text-2xl font-bold text-center mb-4' ref={quizNameRef}>
+                    Quiz!
+                </p>
+                <p className='text-lg text-gray-600 text-center mb-4' ref={quizDescriptionRef}>
+                    퀴즈를 불러오거나 직접 입력하여 시작하세요.
+                </p>
+                <p className='text-sm text-gray-500 text-center mb-4' ref={quizAutherDateRef}></p>
                 <div className='flex justify-center items-center space-x-2 mb-4 mt-4'>
-                    <button className='bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600' onClick={startGame}>
+                    <button className='w-1/4 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600' onClick={startGame}>
                         시작
                     </button>
                 </div>
@@ -110,27 +155,57 @@ const StartMenu = () => {
                 ></div>
             </div>
 
-            {/* 옵션 카드 */}
+            <div className='card'>
+                <h2 className='text-xl font-semibold text-center mb-4'>퀴즈 데이터 불러오기</h2>
+                <p className='text-sm text-gray-600 text-center mb-4'>JSON 데이터를 직접 입력하거나 선택하세요.</p>
+                <div className='flex justify-center items-center space-x-2 mb-4 mt-4'>
+                    <select className='w-[70%] p-2 border border-gray-300 rounded-lg' onChange={changeQuizData}>
+                        <option value='input'>직접 입력</option>
+                        <option value='korea'>한국사</option>
+                    </select>
+                    <button
+                        className='w-[30%] bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600'
+                        onClick={fetchQuizData}
+                        ref={quizFetchButtonRef}
+                    >
+                        검증 및 불러오기
+                    </button>
+                </div>
+                <Editor
+                    language='json'
+                    defaultValue={'{"JSON": "데이터를 입력하세요"}\n'}
+                    theme='vs-light'
+                    className='w-full h-64 p-2 border border-gray-300 rounded-lg'
+                    options={{
+                        fontSize: 14,
+                    }}
+                    onMount={(editor) => {
+                        quizDataMonacoRef.current = editor
+                    }}
+                    onChange={() => {
+                        quizFetchButtonRef.current!.disabled = false
+                    }}
+                ></Editor>
+            </div>
+
             <div className='card'>
                 <h2 className='text-xl font-semibold text-center mb-4'>옵션 (선택)</h2>
                 <p className='text-sm text-gray-600 text-center mb-4'>필요 시에만 선택하세요.</p>
                 <div className='space-y-2'>
-                    <div className='flex items-center space-x-2'>
-                        <input type='checkbox' ref={showCorrectRateRef} className='w-4 h-4' onChange={showCorrectRateChange} defaultChecked />
-                        <label htmlFor='strokeImage' className='text-gray-700'>
+                    <div className='flex items-center space-x-2 pl-0 md:pl-10 pb-2'>
+                        <input
+                            id='rateshow'
+                            type='checkbox'
+                            ref={showCorrectRateRef}
+                            className='w-4 h-4'
+                            onChange={showCorrectRateChange}
+                            defaultChecked
+                        />
+                        <label htmlFor='rateshow' className='text-gray-700'>
                             정답률 표시 함
                         </label>
                     </div>
                 </div>
-            </div>
-
-            <div className='card'>
-                <h2 className='text-xl font-semibold text-center mb-4'>퀴즈 데이터 불러오기</h2>
-                <p className='text-sm text-gray-600 text-center mb-4'>JSON 데이터를 직접 입력하세요.</p>
-                <textarea className='w-full h-32 p-2 border border-gray-300 rounded-lg' placeholder='JSON 데이터'></textarea>
-                <button className='bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600' onClick={fetchQuizData}>
-                    검증 및 불러오기
-                </button>
             </div>
         </div>
     )

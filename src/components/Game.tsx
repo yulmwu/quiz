@@ -47,6 +47,16 @@ const Game = () => {
         else score += n
 
         scoreRef.current!.textContent = `점수: ${score} ${showCorrectRate ? `(정답률: ${calcCorrectRate().toFixed(2)}%)` : ''}`
+
+        if (score === 0) return
+
+        if (score < 0) {
+            scoreRef.current!.classList.add('text-red-700')
+            scoreRef.current!.classList.remove('text-green-700')
+        } else {
+            scoreRef.current!.classList.add('text-green-700')
+            scoreRef.current!.classList.remove('text-red-700')
+        }
     }
 
     const nextQuestion = () => {
@@ -86,10 +96,22 @@ const Game = () => {
 
         const optionsDiv = optionsRef.current as HTMLDivElement
         optionsDiv.innerHTML = ''
-        options.forEach((option) => {
+
+        const is_even = options.length % 2 === 0
+
+        options.forEach((option, i) => {
             const button = document.createElement('button')
             button.textContent = option
-            button.className = 'bg-gray-200 text-gray-800 px-4 py-2 rounded-lg shadow-md hover:bg-gray-300'
+
+            button.classList.add(
+                i === options.length - 1 && !is_even ? 'w-full' : 'w-[calc(50%-0.5rem)]', // 50% - 0.5rem(8px) (half of the gap)
+                'h-32',
+                'bg-gray-200',
+                'text-gray-800',
+                'rounded-lg',
+                'shadow-md',
+                'hover:bg-gray-300'
+            )
             button.onclick = () => checkAnswer(option, button)
             optionsDiv.appendChild(button)
         })
@@ -153,7 +175,7 @@ const Game = () => {
             </div>
 
             <div className='card'>
-                <div id='options' className='flex flex-col gap-5' ref={optionsRef}></div>
+                <div id='options' className='flex flex-wrap gap-4' ref={optionsRef}></div>
                 <div className='flex justify-center flex-wrap gap-5 mt-5'>
                     <button
                         className='bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600'

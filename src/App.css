@@ -17,7 +17,7 @@
     border-radius: 1rem;
     padding: 1.5rem;
     width: 100%;
-    max-width: 600px;
+    max-width: 800px;
     margin-top: 1.5rem;
 }
 
@@ -27,6 +27,10 @@
 
 .incorrect {
     background-color: #ff978c;
+}
+
+button {
+    cursor: pointer;
 }
 
 /* disabled button */

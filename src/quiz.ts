@@ -1,5 +1,3 @@
-import koreaQuiz from './data/korea.json'
-
 interface Quiz {
     name: string
     description: string
@@ -14,7 +12,6 @@ interface Question {
     hint?: string
 }
 
-const quiz: Quiz = koreaQuiz as Quiz
+// https://raw.githubusercontent.com/yulmwu/quiz_data/refs/heads/main/korea.json
 
 export type { Quiz, Question }
-export { quiz }

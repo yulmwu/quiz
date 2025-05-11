@@ -1,6 +1,9 @@
 {
     "name": "한국사 고려 퀴즈",
     "description": "고려시대에 대한 퀴즈입니다.",
+    "authors": ["Kim Jun Young"],
+    "lastUpdated": "2025-05-11",
+    "category": "한국사",
     "questions": [
         {
             "question": "고려의 건국 연도는?",
@@ -11,7 +14,7 @@
         },
         {
             "question": "고려의 수도는?",
-            "options": ["개경", "한양", "평양", "부여"],
+            "options": ["개경", "한양", "평양", "부여", "철원"],
             "correct": "개경",
             "explanation": "고려의 수도는 개경(현재의 개성)입니다.",
             "hint": "멍멍"
