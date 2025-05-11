@@ -58,11 +58,11 @@ const StartMenu = () => {
         }
     }
 
-    // const error = (message: string) => {
-    //     const error = errorRef.current as HTMLDivElement
-    //     error.textContent = message
-    //     error.classList.remove('hidden')
-    // }
+    const error = (message: string) => {
+        const error = errorRef.current as HTMLDivElement
+        error.textContent = message
+        error.classList.remove('hidden')
+    }
 
     const updateSettings = (start: boolean) => {
         const showCorrectRate = (showCorrectRateRef.current as HTMLInputElement).checked
@@ -75,8 +75,7 @@ const StartMenu = () => {
 
     const startGame = () => {
         if (!useSettings.getState().quiz) {
-            errorRef.current!.textContent = '퀴즈 데이터를 불러오지 않았습니다.'
-            errorRef.current!.classList.remove('hidden')
+            error('퀴즈 데이터를 불러오지 않았습니다.')
             return
         }
 
@@ -96,9 +95,8 @@ const StartMenu = () => {
             quizAutherDateRef.current!.textContent = `${quiz.authors.join(', ')} / 최종 업데이트: ${quiz.lastUpdated}`
 
             quizFetchButtonRef.current!.disabled = true
-        } catch (error) {
-            errorRef.current!.textContent = 'Invalid JSON'
-            errorRef.current!.classList.remove('hidden')
+        } catch (err) {
+            error('잘못된 JSON 형식입니다.')
         }
     }
 
@@ -113,22 +111,20 @@ const StartMenu = () => {
                 url = 'https://raw.githubusercontent.com/yulmwu/quiz_data/refs/heads/main/korea.json'
                 break
             default:
-                errorRef.current!.textContent = 'Invalid quiz data'
-                errorRef.current!.classList.remove('hidden')
+                error('Invalid quiz data')
                 return
         }
 
         fetch(url)
             .then((response) => {
-                if (!response.ok) throw new Error('Error fetching quiz data')
+                if (!response.ok) throw new Error('가져오는 도중 오류 발생가 발생했습니다.')
                 return response.json()
             })
             .then((data) => {
                 quizDataMonacoRef.current!.setValue(JSON.stringify(data, null, 4))
             })
             .catch((_) => {
-                errorRef.current!.textContent = 'Failed to fetch quiz data'
-                errorRef.current!.classList.remove('hidden')
+                error('가져오는 도중 오류 발생가 발생했습니다.')
             })
     }
 
@@ -174,7 +170,6 @@ const StartMenu = () => {
                 <Editor
                     language='json'
                     defaultValue={'{"JSON": "데이터를 입력하세요"}\n'}
-                    theme='vs-light'
                     className='w-full h-64 p-2 border border-gray-300 rounded-lg'
                     options={{
                         fontSize: 14,
