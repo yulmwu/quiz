@@ -1,8 +1,8 @@
 {
-    "name": "jp-study-react",
+    "name": "quiz-app",
     "version": "0.1.0",
     "private": true,
-    "homepage": "https://yulmwu.github.io/jp-study",
+    "homepage": "https://yulmwu.github.io/quiz",
     "dependencies": {
         "@testing-library/dom": "^10.4.0",
         "@testing-library/jest-dom": "^6.6.3",
