@@ -18,7 +18,6 @@ interface Settings {
     quiz: Quiz | null
     playing: boolean
     score: number
-    // duplevel: number
     correctCount: number
     incorrectCount: number
     showCorrectRate: boolean
@@ -96,7 +95,7 @@ const StartMenu = () => {
 
             quizFetchButtonRef.current!.disabled = true
         } catch (err) {
-            error('잘못된 JSON 형식입니다.')
+            error('잘못된 JSON 형식이거나 올바른 퀴즈 데이터가 아닙니다.')
         }
     }
 
@@ -109,6 +108,9 @@ const StartMenu = () => {
                 return
             case 'korea':
                 url = 'https://raw.githubusercontent.com/yulmwu/quiz_data/refs/heads/main/korea.json'
+                break
+            case 'example':
+                url = 'https://raw.githubusercontent.com/yulmwu/quiz_data/refs/heads/main/example.json'
                 break
             default:
                 error('Invalid quiz data')
@@ -158,6 +160,7 @@ const StartMenu = () => {
                     <select className='w-[70%] p-2 border border-gray-300 rounded-lg' onChange={changeQuizData}>
                         <option value='input'>직접 입력</option>
                         <option value='korea'>한국사</option>
+                        <option value='example'>퀴즈 예시</option>
                     </select>
                     <button
                         className='w-[30%] bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600'
