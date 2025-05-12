@@ -10,6 +10,7 @@ interface Question {
     correct: string
     explanation: string
     hint?: string
+    difficulty?: 'easy' | 'normal' | 'hard'
 }
 
 // https://raw.githubusercontent.com/yulmwu/quiz_data/refs/heads/main/korea.json

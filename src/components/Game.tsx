@@ -10,6 +10,7 @@ const Game = () => {
 
     const scoreRef = useRef<HTMLHeadingElement>(null) // 점수
     const questionRef = useRef<HTMLHeadingElement>(null) // 문제
+    const difficultyRef = useRef<HTMLDivElement>(null) // 난이도
     const hintRef = useRef<HTMLParagraphElement>(null) // 힌트
     const resultRef = useRef<HTMLParagraphElement>(null) // 정답 여부
     const optionsRef = useRef<HTMLDivElement>(null) // 문제 답변 선택지
@@ -84,6 +85,33 @@ const Game = () => {
             hintButtonRef.current!.disabled = false
         } else {
             hintButtonRef.current!.disabled = true
+        }
+
+        if (currentQuestion.difficulty) {
+            const difficultyDiv = difficultyRef.current as HTMLDivElement
+            difficultyDiv.innerHTML = ''
+            const difficulty = document.createElement('p')
+            difficulty.className = 'text-lg text-center'
+
+            switch (currentQuestion.difficulty) {
+                case 'easy':
+                    difficulty.textContent = `난이도 쉬움`
+                    difficulty.classList.add('text-green-500')
+                    break
+                case 'normal':
+                    difficulty.textContent = `난이도 보통`
+                    difficulty.classList.add('text-yellow-500')
+                    break
+                case 'hard':
+                    difficulty.textContent = `난이도 어려움`
+                    difficulty.classList.add('text-red-500')
+                    break
+            }
+
+            difficultyDiv.appendChild(difficulty)
+        } else {
+            const difficultyDiv = difficultyRef.current as HTMLDivElement
+            difficultyDiv.innerHTML = ''
         }
 
         genarateOptions()
@@ -170,6 +198,9 @@ const Game = () => {
                     <p id='question' className='text-3xl text-center' ref={questionRef}>
                         ?
                     </p>
+                </div>
+                <div className='flex justify-center mt-5' ref={difficultyRef}>
+                    {/* difficulty */}
                 </div>
                 <p id='result' className='text-center pt-3' ref={resultRef}></p>
             </div>
