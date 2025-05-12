@@ -2,6 +2,7 @@ import { useRef, useEffect } from 'react'
 import { useSettings } from './StartMenu'
 
 import Settings from '../data/settings.json'
+
 import { Question } from '../quiz'
 import createFirework from '../utils/firework'
 

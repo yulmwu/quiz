@@ -6,6 +6,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faExpand } from '@fortawesome/free-solid-svg-icons'
 import ExpandEditorModal from './ExpandEditorModal'
 
+import DefaultJSON from '../data/default.json'
+
 interface Settings {
     quiz: Quiz | null
     playing: boolean
@@ -153,7 +155,13 @@ const StartMenu = () => {
 
             <div className='card'>
                 <h2 className='text-xl font-semibold text-center mb-4'>퀴즈 데이터 불러오기</h2>
-                <p className='text-sm text-gray-600 text-center mb-4'>JSON 데이터를 직접 입력하거나 선택하세요.</p>
+                <p className='text-sm text-gray-600 text-center mb-4'>
+                    JSON 데이터를 직접 입력하거나 선택하세요.
+                    <a href='https://github.com/yulmwu/quiz_data' className='text-blue-500'>
+                        {' '}
+                        [퀴즈 데이터 목록]
+                    </a>
+                </p>
                 <div className='flex justify-center items-center space-x-2 mb-4 mt-4'>
                     <select className='w-[70%] p-2 border border-gray-300 rounded-lg' onChange={changeQuizData}>
                         <option value='input'>직접 입력</option>
@@ -170,7 +178,7 @@ const StartMenu = () => {
                 </div>
                 <Editor
                     language='json'
-                    defaultValue={'{"JSON": "데이터를 입력하세요"}\n'}
+                    defaultValue={JSON.stringify(DefaultJSON, null, 4)}
                     className='w-full h-64 p-2 border border-gray-300 rounded-lg'
                     options={{
                         fontSize: 14,
