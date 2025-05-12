@@ -65,21 +65,19 @@ button:disabled {
 }
 
 @keyframes incorrect-animation {
-    0% { transform: translateX(0); }
-    25% { transform: translateX(-3px); }
-    50% { transform: translateX(3px); }
-    75% { transform: translateX(-3px); }
-    100% { transform: translateX(0); }
-}
-
-.font-sans-serif {
-    font-family: "Noto Sans JP", sans-serif;
-    font-optical-sizing: auto;
-    font-style: normal;
-}
-
-.font-serif {
-    font-family: 'Noto Serif JP', sans-serif;
-    font-optical-sizing: auto;
-    font-style: normal;
+    0% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-3px);
+    }
+    50% {
+        transform: translateX(3px);
+    }
+    75% {
+        transform: translateX(-3px);
+    }
+    100% {
+        transform: translateX(0);
+    }
 }

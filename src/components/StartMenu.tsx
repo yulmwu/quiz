@@ -1,19 +1,11 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import { create } from 'zustand'
 import { Quiz } from '../quiz'
 import { Editor } from '@monaco-editor/react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faExpand } from '@fortawesome/free-solid-svg-icons'
+import ExpandEditorModal from './ExpandEditorModal'
 
-/**
- * playing: 게임 진행 여부
- * score: 점수
- * timer: 한 문제 당 시간 제한 (초)
- * timeRemaining: 전체 시간 제한 (초)
- * nextNow: 정답 후 바로 넘어가기 여부
- * particle: 파티클 효과 여부
- * correctCount: 정답 개수
- * incorrectCount: 오답 개수
- * showCorrectRate: 정답률 표시 여부
- */
 interface Settings {
     quiz: Quiz | null
     playing: boolean
@@ -44,6 +36,10 @@ const StartMenu = () => {
 
     const quizDataMonacoRef = useRef<any>(null)
     const quizFetchButtonRef = useRef<HTMLButtonElement>(null)
+
+    const quizDataMonacoExpandRef = useRef<any>(null)
+
+    const quizDataMonacoExpandImportButtonRef = useRef<HTMLButtonElement>(null)
 
     const checkboxLabelChange = (e: React.ChangeEvent<HTMLInputElement>, text: string) => {
         if (e.currentTarget.nextElementSibling) e.currentTarget.nextElementSibling.textContent = text
@@ -130,6 +126,8 @@ const StartMenu = () => {
             })
     }
 
+    const [modalOpen, setModalOpen] = useState(false)
+
     return (
         <div className='container'>
             <div className='card'>
@@ -184,6 +182,58 @@ const StartMenu = () => {
                         quizFetchButtonRef.current!.disabled = false
                     }}
                 ></Editor>
+                <div className='flex justify-end mt-2'>
+                    <FontAwesomeIcon
+                        icon={faExpand}
+                        className='text-gray-500 cursor-pointer mr-1'
+                        onClick={() => {
+                            setModalOpen(true)
+                        }}
+                    />
+                </div>
+                <ExpandEditorModal open={modalOpen}>
+                    <div className='w-full h-[70vh]'>
+                        <Editor
+                            language='json'
+                            className='w-full h-full p-2 border border-gray-300 rounded-lg'
+                            options={{
+                                fontSize: 14,
+                            }}
+                            onMount={(editor) => {
+                                quizDataMonacoExpandRef.current = editor
+                            }}
+                        ></Editor>
+                    </div>
+                    <div className='flex justify-end mt-2'>
+                        <button
+                            className='bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600'
+                            onClick={() => {
+                                quizDataMonacoExpandRef.current!.setValue(quizDataMonacoRef.current!.getValue())
+                                quizDataMonacoExpandImportButtonRef.current!.disabled = true
+                            }}
+                            ref={quizDataMonacoExpandImportButtonRef}
+                        >
+                            기존 데이터 불러오기
+                        </button>
+                        <button
+                            className='bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 ml-2'
+                            onClick={() => {
+                                quizDataMonacoRef.current!.setValue(quizDataMonacoExpandRef.current!.getValue())
+                                setModalOpen(false)
+                            }}
+                        >
+                            저장
+                        </button>
+                        <button
+                            className='bg-gray-300 text-gray-700 px-4 py-2 rounded-lg shadow-md hover:bg-gray-400 ml-2'
+                            onClick={() => {
+                                setModalOpen(false)
+                            }}
+                        >
+                            취소
+                        </button>
+                    </div>
+                </ExpandEditorModal>
             </div>
 
             <div className='card'>
