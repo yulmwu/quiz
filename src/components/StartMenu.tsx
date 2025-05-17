@@ -105,7 +105,7 @@ const StartMenu = () => {
             case 'input':
                 return
             case 'korea':
-                url = 'https://raw.githubusercontent.com/yulmwu/quiz_data/refs/heads/main/korea.json'
+                url = 'https://raw.githubusercontent.com/yulmwu/quiz_data/refs/heads/main/korea/modern.json'
                 break
             case 'example':
                 url = 'https://raw.githubusercontent.com/yulmwu/quiz_data/refs/heads/main/example.json'
@@ -163,17 +163,32 @@ const StartMenu = () => {
                     </a>
                 </p>
                 <div className='flex justify-center items-center space-x-2 mb-4 mt-4'>
-                    <select className='w-[70%] p-2 border border-gray-300 rounded-lg' onChange={changeQuizData}>
+                    <select className='w-[60%] p-2 border border-gray-300 rounded-lg' onChange={changeQuizData}>
                         <option value='input'>직접 입력</option>
                         <option value='korea'>한국사</option>
                         <option value='example'>퀴즈 예시</option>
                     </select>
+                    <input
+                        type='file'
+                        accept='.json'
+                        className='w-[20%] p-2 border border-gray-300 rounded-lg'
+                        onChange={(e) => {
+                            const file = e.currentTarget.files?.[0]
+                            if (file) {
+                                const reader = new FileReader()
+                                reader.onload = (event) => {
+                                    quizDataMonacoRef.current!.setValue(event.target?.result as string)
+                                }
+                                reader.readAsText(file)
+                            }
+                        }}
+                    />
                     <button
-                        className='w-[30%] bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600'
+                        className='w-[20%] bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600'
                         onClick={fetchQuizData}
                         ref={quizFetchButtonRef}
                     >
-                        검증 및 불러오기
+                        확인
                     </button>
                 </div>
                 <Editor
